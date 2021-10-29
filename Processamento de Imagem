@@ -1,0 +1,78 @@
+% Ler a Imagem
+I = imread ('img.jpeg');
+
+
+
+% Converter em Tons de Cinza
+RGB = rgb2gray (I);
+PB = imbinarizar (RGB);
+
+
+
+% Removedor de ruidos
+PB = bwareaopen (PB, 30);
+
+
+
+% Remover Buracos na imagem
+PB = imfill (PB, 'buracos');
+
+
+
+% Mostra como imagens lado a lado
+figura 1);
+subtrama (1,2,1);
+imshow (I);
+título ('Imagem Original');
+subtrama (1,2,2);
+imshow (PB);
+título ('Imagem Processada');
+
+
+
+% Indentificar formas circulares
+[B, L] = limites bw (PB, 'noholes');
+
+imshow (label2rgb (L, @ jet, [. 5 .5 .5]))
+aguentar
+para k = 1: comprimento (B)
+  limite = B {k};
+  plot (limite (:, 2), limite (:, 1), 'w', 'LineWidth', 2)
+fim
+
+estatísticas = regionprops (L, 'Área', 'Centroid');
+
+limiar = 0,94;
+
+% loop sobre os limites
+para k = 1: comprimento (B)
+
+  % obtém (X, Y) coordenadas de limite correspondentes ao rótulo 'k'
+  limite = B {k};
+
+  % calcula uma estimativa simples do perímetro do objeto
+  delta_sq = diff (limite). ^ 2;    
+  perímetro = soma (sqrt (sum (delta_sq, 2)));
+  
+  % obtém o cálculo da área correspondente ao rótulo 'k'
+  área = estatísticas (k). Área;
+  
+  % calcula a métrica de circularidade
+  métrico = 4 * pi * área / perímetro ^ 2;
+  
+  % exibe os resultados
+  metric_string = sprintf ('% 2.2f', métrico);
+
+  % marca objetos acima do limite com um círculo preto
+  se métrica> limite
+    centróide = estatísticas (k) .Centroid;
+    plot (centróide (1), centróide (2), 'ko');
+  fim
+  
+  texto (limite (1,2) -35, limite (1,1) + 13, metric_string, 'Color', 'y', ...
+       'FontSize', 14, 'FontWeight', 'negrito')
+  
+fim
+
+title (['Métricas mais próximas de 1 indicam que', ...
+       'o objeto é aproximadamente redondo'])
